@@ -4,690 +4,2430 @@
 
 <head>
 
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ポケモン タイプ相性表</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        rel="stylesheet">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    table {
+      width: 100%;
+    }
 
-    <title>ポケモン タイプ相性表</title>
+    thead th {
+      position: sticky;
+      top: 0;
+      background-color: #333; /* スクロール時にも背景色が見えるように設定 */
+      z-index: 100;
+    }
 
-    <style>
+    tbody th {
+      position: sticky;
+      left: 0;
+      background-color: #333; /* スクロール時にも背景色が見えるように設定 */
+      z-index: 99;
+    }
 
-        table {
+    th, td {
+      text-align: center;
+      padding: 8px;
+    }
 
-            border-collapse: collapse;
+    th {
+      color: white;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
 
-            width: 100%;
+    th::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
 
-        }
+    th span {
+      position: relative;
+      z-index: 2;
+    }
 
-        th, td {
+    th.axis-label {
+      background-color: #333;
+      color: white;
+      text-shadow: none;
+    }
 
-            border: 1px solid #ddd;
+    td {
+      background-color: #f2f2f2;
+      position: relative;
+      cursor: pointer;
+    }
 
-            padding: 8px;
+    td select {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+      background-color: transparent; /* 背景色を透明にする */
+      z-index: 1;
+    }
 
-            text-align: center;
+    td select:focus {
+      z-index: 2;
+      background-color: white;
+    }
 
-        }
+    td select.focused {
+      opacity: 1;
+      z-index: 2;
+      background-color: white;
+    }
 
-        th {
-            color: white;
-            background-size: cover;
-            background-position: center;
-        }
+    /* エラーハイライトのスタイル */
+    .error-highlight {
+      background-color: #FFCCCC !important; /* !important を使用して優先度を高める */
+    }
 
-        td {
+    .table-responsive {
+      overflow-x: auto;
+      overflow-y: auto; /* 縦スクロールを可能にする */
+      max-height: 500px; /* 任意で、最大高さを設定 */
+      margin-top: 20px;
+    }
 
-            background-color: #f2f2f2;
+    #accuracy {
+      float: right;
+      margin-top: 10px;
+    }
 
-        }
+    /* ノーマルタイプ */
+    .normal {
+      background-image: url('/images/normal.png');
+    }
 
-        /* ノーマルタイプ */
-        .normal {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/normal.png?raw=true');
-        }
+    /* ほのおタイプ */
+    .fire {
+      background-image: url('/images/fire.png');
+    }
 
-        /* ほのおタイプ */
-        .fire {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/fire.png?raw=true');
-        }
+    /* みずタイプ */
+    .water {
+      background-image: url('/images/water.png');
+    }
 
-        /* みずタイプ */
-        .water {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/water.png?raw=true');
-        }
+    /* でんきタイプ */
+    .electric {
+      background-image: url('/images/electric.png');
+    }
 
-        /* でんきタイプ */
-        .electric {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/electric.png?raw=true');
-        }
+    /* くさタイプ */
+    .grass {
+      background-image: url('/images/grass.png');
+    }
 
-        /* くさタイプ */
-        .grass {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/grass.png?raw=true');
-        }
+    /* こおりタイプ */
+    .ice {
+      background-image: url('/images/ice.png');
+    }
 
-        /* こおりタイプ */
-        .ice {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/ice.png?raw=true');
-        }
+    /* かくとうタイプ */
+    .fighting {
+      background-image: url('/images/fighting.png');
+    }
 
-        /* かくとうタイプ */
-        .fighting {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/fighting.png?raw=true');
-        }
+    /* どくタイプ */
+    .poison {
+      background-image: url('/images/poison.png');
+    }
 
-        /* どくタイプ */
-        .poison {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/poison.png?raw=true');
-        }
+    /* じめんタイプ */
+    .ground {
+      background-image: url('/images/ground.png');
+    }
 
-        /* じめんタイプ */
-        .ground {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/ground.png?raw=true');
-        }
+    /* ひこうタイプ */
+    .flying {
+      background-image: url('/images/flying.png');
+    }
 
-        /* ひこうタイプ */
-        .flying {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/flying.png?raw=true');
-        }
+    /* エスパータイプ */
+    .psychic {
+      background-image: url('/images/psychic.png');
+    }
 
-        /* エスパータイプ */
-        .psychic {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/psychic.png?raw=true');
-        }
+    /* むしタイプ */
+    .bug {
+      background-image: url('/images/bug.png');
+    }
 
-        /* むしタイプ */
-        .bug {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/bug.png?raw=true');
-        }
+    /* いわタイプ */
+    .rock {
+      background-image: url('/images/rock.png');
+    }
 
-        /* いわタイプ */
-        .rock {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/rock.png?raw=true');
-        }
+    /* ゴーストタイプ */
+    .ghost {
+      background-image: url('/images/ghost.png');
+    }
 
-        /* ゴーストタイプ */
-        .ghost {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/ghost.png?raw=true');
-        }
+    /* ドラゴンタイプ */
+    .dragon {
+      background-image: url('/images/dragon.png');
+    }
 
-        /* ドラゴンタイプ */
-        .dragon {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/dragon.png?raw=true');
-        }
+    /* あくタイプ */
+    .dark {
+      background-image: url('/images/dark.png');
+    }
 
-        /* あくタイプ */
-        .dark {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/dark.png?raw=true');
-        }
+    /* はがねタイプ */
+    .steel {
+      background-image: url('/images/steel.png');
+    }
 
-        /* はがねタイプ */
-        .steel {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/steel.png?raw=true');
-        }
-
-        /* フェアリータイプ */
-        .fairy {
-            background-image: url('https://github.com/maikeruosu/memo/blob/main/images/fairy.png?raw=true');
-        }
-
-
-        .error-highlight {
-
-            background-color: #FFCCCC;
-
-        }
-
-        #accuracy {
-
-            float: right;
-
-            margin-top: 10px;
-
-        }
-
-    </style>
+    /* フェアリータイプ */
+    .fairy {
+      background-image: url('/images/fairy.png');
+    }
+  </style>
 
 </head>
 
 <body>
+<div class="container">
+  <h1 class="text-center my-4">ポケモン タイプ相性表</h1>
+  <div class="text-center mt-4">
+    <button id="resetBtnTop" class="btn btn-secondary">リセット</button>
+    <button id="answerBtnTop" class="btn btn-primary">答え</button>
+    <button id="submitBtnTop" class="btn btn-success">提出</button>
+  </div>
+  <div id="accuracy" class="text-right mb-3">正答率: <span id="accuracy-rate">0</span>%</div>
+  <div class="table-responsive">
+    <table class="table table-bordered">
 
-<h1>ポケモン タイプ相性表</h1>
+      <thead class="thead-dark">
 
-<div id="accuracy">正答率: <span id="accuracy-rate">0</span>%</div>
+      <tr>
 
-<table>
+        <th class="axis-label"><span>攻撃\防御</span></th>
 
-    <thead>
+        <th class="normal"><span>ノーマル</span></th>
+        <th class="fire"><span>ほのお</span></th>
+        <th class="water"><span>みず</span></th>
+        <th class="electric"><span>でんき</span></th>
+        <th class="grass"><span>くさ</span></th>
+        <th class="ice"><span>こおり</span></th>
+        <th class="fighting"><span>かくとう</span></th>
+        <th class="poison"><span>どく</span></th>
+        <th class="ground"><span>じめん</span></th>
+        <th class="flying"><span>ひこう</span></th>
+        <th class="psychic"><span>エスパー</span></th>
+        <th class="bug"><span>むし</span></th>
+        <th class="rock"><span>いわ</span></th>
+        <th class="ghost"><span>ゴースト</span></th>
+        <th class="dragon"><span>ドラゴン</span></th>
+        <th class="dark"><span>あく</span></th>
+        <th class="steel"><span>はがね</span></th>
+        <th class="fairy"><span>フェアリー</span></th>
 
-        <tr>
+      </tr>
 
-            <th>攻撃\防御</th>
+      </thead>
 
-            <th>ノーマル</th>
+      <tbody>
+      <!-- ノーマル -->
+      <tr>
+        <th class="normal"><span>ノーマル</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- ほのお -->
+      <tr>
+        <th class="fire"><span>ほのお</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- みず -->
+      <tr>
+        <th class="water"><span>みず</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- でんき -->
+      <tr>
+        <th class="electric"><span>でんき</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>ほのお</th>
+      </tr>
+      <!-- くさ -->
+      <tr>
+        <th class="grass"><span>くさ</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>みず</th>
+      </tr>
+      <!-- こおり -->
+      <tr>
+        <th class="ice"><span>こおり</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>でんき</th>
+      </tr>
+      <!-- かくとう -->
+      <tr>
+        <th class="fighting"><span>かくとう</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- どく -->
+      <tr>
+        <th class="poison"><span>どく</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- じめん -->
+      <tr>
+        <th class="ground"><span>じめん</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>くさ</th>
+      </tr>
+      <!-- ひこう -->
+      <tr>
+        <th class="flying"><span>ひこう</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>こおり</th>
+      </tr>
+      <!-- エスパー -->
+      <tr>
+        <th class="psychic"><span>エスパー</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>かくとう</th>
+      </tr>
+      <!-- むし -->
+      <tr>
+        <th class="bug"><span>むし</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>どく</th>
+      </tr>
+      <!-- いわ -->
+      <tr>
+        <th class="rock"><span>いわ</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>じめん</th>
+      </tr>
+      <!-- ゴースト -->
+      <tr>
+        <th class="ghost"><span>ゴースト</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>ひこう</th>
+      </tr>
+      <!-- ドラゴン -->
+      <tr>
+        <th class="dragon"><span>ドラゴン</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>エスパー</th>
+      </tr>
+      <!-- あく -->
+      <tr>
+        <th class="dark"><span>あく</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
 
-            <th>むし</th>
+      </tr>
+      <!-- はがね -->
+      <tr>
+        <th class="steel"><span>はがね</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      <!-- フェアリー -->
+      <tr>
+        <th class="fairy"><span>フェアリー</span></th>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+        <td><select>
+          <option value=""></option>
+          <option value="×">×</option>
+          <option value="△">△</option>
+          <option value="○">○</option>
+        </select></td>
+      </tr>
+      </tbody>
 
-            <th>いわ</th>
+    </table>
+  </div>
+  <div class="text-center mt-4">
+    <button id="resetBtn" class="btn btn-secondary">リセット</button>
+    <button id="answerBtn" class="btn btn-primary">答え</button>
+    <button id="submitBtn" class="btn btn-success">提出</button>
+  </div>
 
-            <th>ゴースト</th>
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-            <th>ドラゴン</th>
-
-            <th>あく</th>
-
-            <th>はがね</th>
-
-            <th>フェアリー</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-        <!-- ノーマル -->
-        <tr>
-            <th>ノーマル</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- ほのお -->
-        <tr>
-            <th>ほのお</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- みず -->
-        <tr>
-            <th>みず</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- でんき -->
-        <tr>
-            <th>でんき</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- くさ -->
-        <tr>
-            <th>くさ</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- こおり -->
-        <tr>
-            <th>こおり</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- かくとう -->
-        <tr>
-            <th>かくとう</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- どく -->
-        <tr>
-            <th>どく</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- じめん -->
-        <tr>
-            <th>じめん</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- ひこう -->
-        <tr>
-            <th>ひこう</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- エスパー -->
-        <tr>
-            <th>エスパー</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- むし -->
-        <tr>
-            <th>むし</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- いわ -->
-        <tr>
-            <th>いわ</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- ゴースト -->
-        <tr>
-            <th>ゴースト</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- ドラゴン -->
-        <tr>
-            <th>ドラゴン</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- あく -->
-        <tr>
-            <th>あく</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-
-        </tr>
-        <!-- はがね -->
-        <tr>
-            <th>はがね</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-        <!-- フェアリー -->
-        <tr>
-            <th>フェアリー</th>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-            <td><select><option value=""></option><option value="0x">0x</option><option value="0.5x">0.5x</option><option value="2x">2x</option></select></td>
-        </tr>
-    </tbody>
-
-</table>
-
-<button id="resetBtn">リセット</button>
-<button id="answerBtn">答え</button>
-<button id="submitBtn">提出</button>
-
-<script>
+  <script>
 
     const correctAnswers = {
-        "ノーマル": ["", "", "", "", "", "", "", "", "", "", "", "", "0.5x", "0x", "", "", "0.5x", ""],
-        "ほのお": ["", "0.5x", "0.5x", "", "2x", "2x", "", "", "", "", "", "2x", "0.5x", "", "0.5x", "", "2x", "0.5x"],
-        "みず": ["", "2x", "0.5x", "", "0.5x", "", "", "", "2x", "", "", "", "2x", "", "0.5x", "", "", ""],
-        "でんき": ["", "", "2x", "0.5x", "0.5x", "", "", "", "0x", "2x", "", "", "", "", "0.5x", "", "", ""],
-        "くさ": ["", "0.5x", "2x", "", "0.5x", "0.5x", "", "0.5x", "2x", "0.5x", "", "0.5x", "2x", "", "", "", "0.5x", ""],
-        "こおり": ["", "0.5x", "0.5x", "", "2x", "0.5x", "", "", "2x", "2x", "", "2x", "0.5x", "", "2x", "", "0.5x", ""],
-        "かくとう": ["2x", "", "", "", "2x", "2x", "", "0.5x", "0.5x", "0.5x", "", "0.5x", "2x", "0x", "", "2x", "2x", "0.5x"],
-        "どく": ["", "", "", "", "2x", "", "", "0.5x", "0.5x", "", "0.5x", "", "", "0.5x", "", "", "0.5x", "2x"],
-        "じめん": ["", "2x", "", "2x", "0.5x", "2x", "", "2x", "", "0x", "", "0.5x", "2x", "", "", "", "2x", ""],
-        "ひこう": ["", "0.5x", "", "2x", "2x", "0.5x", "2x", "", "", "", "", "2x", "0.5x", "", "", "", "0.5x", ""],
-        "エスパー": ["", "", "", "", "", "", "2x", "2x", "", "", "0.5x", "", "", "", "", "0x", "0.5x", ""],
-        "むし": ["", "0.5x", "", "", "2x", "", "0.5x", "0.5x", "", "2x", "2x", "", "0.5x", "0.5x", "", "2x", "", "0.5x"],
-        "いわ": ["", "2x", "", "", "0.5x", "2x", "0.5x", "2x", "0.5x", "2x", "", "", "", "", "0.5x", "2x", "2x", "0.5x"],
-        "ゴースト": ["0x", "", "", "", "", "", "", "", "", "", "2x", "", "", "2x", "", "0.5x", "", ""],
-        "ドラゴン": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "2x", "", "0.5x", "0x"],
-        "あく": ["", "", "", "", "", "", "0.5x", "", "", "", "2x", "", "", "2x", "", "0.5x", "2x", "0.5x"],
-        "はがね": ["", "0.5x", "", "", "", "2x", "", "2x", "0.5x", "2x", "", "", "", "0.5x", "", "", "0.5x", "2x"],
-        "フェアリー": ["", "", "", "", "", "", "", "0.5x", "", "", "2x", "", "", "0.5x", "2x", "2x", "0.5x", ""]
+      "ノーマル": ["", "", "", "", "", "", "", "", "", "", "", "", "△", "×", "", "", "△", ""],
+      "ほのお": ["", "△", "△", "", "○", "○", "", "", "", "", "", "○", "△", "", "△", "",
+        "○", ""],
+      "みず": ["", "○", "△", "", "△", "", "", "", "○", "", "", "", "○", "", "△", "", "",
+        ""],
+      "でんき": ["", "", "○", "△", "△", "", "", "", "×", "○", "", "", "", "", "△", "", "",
+        ""],
+      "くさ": ["", "△", "○", "", "△", "", "", "△", "○", "△", "", "△", "○", "",
+        "△",
+        "", "△", ""],
+      "こおり": ["", "△", "△", "", "○", "△", "", "", "○", "○", "", "", "", "", "○",
+        "", "△", ""],
+      "かくとう": ["○", "", "", "", "", "○", "", "△", "", "△", "△", "△", "○", "×", "",
+        "○", "○", "△"],
+      "どく": ["", "", "", "", "○", "", "", "△", "△", "", "", "", "△", "△", "", "",
+        "×",
+        "○"],
+      "じめん": ["", "○", "", "○", "△", "", "", "○", "", "×", "", "△", "○", "", "", "",
+        "○", ""],
+      "ひこう": ["", "", "", "△", "○", "", "○", "", "", "", "", "○", "△", "", "", "",
+        "△", ""],
+      "エスパー": ["", "", "", "", "", "", "○", "○", "", "", "△", "", "", "", "", "×", "△",
+        ""],
+      "むし": ["", "△", "", "", "○", "", "△", "△", "", "△", "○", "", "", "△", "",
+        "○", "△", "△"],
+      "いわ": ["", "○", "", "", "", "○", "△", "", "△", "○", "", "○", "", "", "",
+        "",
+        "△", ""],
+      "ゴースト": ["×", "", "", "", "", "", "", "", "", "", "○", "", "", "○", "", "△", "", ""],
+      "ドラゴン": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "○", "", "△", "×"],
+      "あく": ["", "", "", "", "", "", "△", "", "", "", "○", "", "", "○", "", "△", "",
+        "△"],
+      "はがね": ["", "△", "△", "△", "", "○", "", "", "", "", "", "", "○", "", "", "",
+        "△", "○"],
+      "フェアリー": ["", "△", "", "", "", "", "○", "△", "", "", "", "", "", "", "○", "○",
+        "△",
+        ""]
     };
 
-    document.getElementById("resetBtn").addEventListener("click", function() {
-        document.querySelectorAll("select").forEach(select => {
-            select.value = "";
-            select.classList.remove("error-highlight");
-        });
-        document.getElementById("accuracy-rate").textContent = "0";
+    document.getElementById("resetBtn").addEventListener("click", function () {
+      document.querySelectorAll("select").forEach(select => {
+        select.value = "";
+        select.classList.remove("error-highlight");
+      });
+      document.getElementById("accuracy-rate").textContent = "0";
     });
 
-    document.getElementById("answerBtn").addEventListener("click", function() {
-        const rows = document.querySelectorAll("tbody tr");
-        rows.forEach(row => {
-            const cells = row.querySelectorAll("td select");
-            const attackType = row.querySelector("th").textContent;
-            const answers = correctAnswers[attackType];
-            cells.forEach((cell, index) => {
-                cell.value = answers[index];
-            });
-        });
+    document.getElementById("resetBtnTop").addEventListener("click", function () {
+      document.querySelectorAll("select").forEach(select => {
+        select.value = "";
+        select.classList.remove("error-highlight");
+      });
+      document.getElementById("accuracy-rate").textContent = "0";
     });
 
-    document.getElementById("submitBtn").addEventListener("click", function() {
-        let total = 0;
-        let correct = 0;
-        const rows = document.querySelectorAll("tbody tr");
-        rows.forEach(row => {
-            const cells = row.querySelectorAll("td select");
-            const attackType = row.querySelector("th").textContent;
-            const answers = correctAnswers[attackType];
-            cells.forEach((cell, index) => {
-                total++;
-                if (cell.value === answers[index]) {
-                    cell.classList.remove("error-highlight");
-                    correct++;
-                } else {
-                    cell.classList.add("error-highlight");
-                }
-            });
+    document.getElementById("answerBtn").addEventListener("click", function () {
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td select");
+        const attackType = row.querySelector("th").textContent;
+        const answers = correctAnswers[attackType];
+        cells.forEach((cell, index) => {
+          cell.value = answers[index];
         });
-        const accuracyRate = (correct / total * 100).toFixed(2);
-        document.getElementById("accuracy-rate").textContent = accuracyRate;
+      });
     });
 
-</script>
+    document.getElementById("answerBtnTop").addEventListener("click", function () {
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td select");
+        const attackType = row.querySelector("th").textContent;
+        const answers = correctAnswers[attackType];
+        cells.forEach((cell, index) => {
+          cell.value = answers[index];
+        });
+      });
+    });
 
+    document.querySelectorAll("td").forEach(td => {
+      td.addEventListener("click", function () {
+        const select = this.querySelector("select");
+        if (select) {
+          select.focus();
+          select.click();
+        }
+      });
+
+      td.querySelector("select").addEventListener("change", function () {
+        this.classList.add("focused");
+      });
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", function () {
+      let total = 0;
+      let correct = 0;
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td select");
+        const attackType = row.querySelector("th").textContent;
+        const answers = correctAnswers[attackType];
+        cells.forEach((cell, index) => {
+          total++;
+          if (cell.value === answers[index]) {
+            cell.classList.remove("error-highlight");
+            correct++;
+          } else {
+            cell.classList.add("error-highlight");
+          }
+        });
+      });
+      const accuracyRate = (correct / total * 100).toFixed(2);
+      document.getElementById("accuracy-rate").textContent = accuracyRate;
+    });
+
+    document.getElementById("submitBtnTop").addEventListener("click", function () {
+      let total = 0;
+      let correct = 0;
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const cells = row.querySelectorAll("td select");
+        const attackType = row.querySelector("th").textContent;
+        const answers = correctAnswers[attackType];
+        cells.forEach((cell, index) => {
+          total++;
+          if (cell.value === answers[index]) {
+            cell.classList.remove("error-highlight");
+            correct++;
+          } else {
+            cell.classList.add("error-highlight");
+          }
+        });
+      });
+      const accuracyRate = (correct / total * 100).toFixed(2);
+      document.getElementById("accuracy-rate").textContent = accuracyRate;
+    });
+
+  </script>
+</div>
 </body>
 
 </html>
