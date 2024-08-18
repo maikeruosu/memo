@@ -16,6 +16,21 @@
       width: 100%;
     }
 
+    select {
+      -webkit-appearance: none; /* Safari, Chrome */
+      -moz-appearance: none;    /* Firefox */
+      appearance: none;
+      text-align: center;
+      text-align-last: center; /* IE11+、Firefoxのため */
+      -moz-text-align-last: center; /* Firefox 28以下のため */
+      padding-right: 0; /* 右側の余白を調整 */
+    }
+
+    /* テキストを中央に配置するためのoption要素のスタイル */
+    option {
+      text-align: center;
+    }
+
     thead th {
       position: sticky;
       top: 0;
